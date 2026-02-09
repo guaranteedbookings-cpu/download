@@ -511,15 +511,44 @@
         <h2>STOP USING AIRBNB DATA.<br>START SECURING BOOKINGS.</h2>
         <p>Join 2,400+ operators using real-world construction data.</p>
         
-        <form>
-            <input type="email" placeholder="Enter your email" required>
-            <button type="submit" class="btn-dark">GET THE BLUEPRINT →</button>
+                <form id="leadCaptureForm">
+            <input type="email" id="emailInput" placeholder="Enter your email" required>
+            <button type="submit" id="submitBtn" class="btn-dark">GET THE BLUEPRINT →</button>
         </form>
+        <div id="successMessage" style="display: none; background: #000; color: #FFD700; padding: 20px; margin-top: 20px; font-weight: 700; border: 2px solid #000;">✓ Check your inbox! The PDF is on its way.</div>
         
         <p style="font-size: 12px; opacity: 0.6; margin-top: 20px;">
             No spam. Unsubscribe anytime. PDF delivered instantly.
         </p>
     </section>
+    <script>
+document.getElementById('leadCaptureForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('emailInput').value.trim();
+    const btn = document.getElementById('submitBtn');
+    
+    if (!email.includes('@')) return alert('Please enter a valid email');
+    
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    
+    try {
+        const res = await fetch('https://YOUR-N8N-URL/webhook/lead-capture', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email: email, source: 'blueprint_landing', timestamp: new Date().toISOString()})
+        });
+        
+        if (res.ok) {
+            document.getElementById('leadCaptureForm').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+        }
+    } catch (err) {
+        btn.textContent = 'Error - Try Again';
+        setTimeout(() => { btn.textContent = 'GET THE BLUEPRINT →'; btn.disabled = false; }, 3000);
+    }
+});
+</script>
 
 </body>
 </html>
